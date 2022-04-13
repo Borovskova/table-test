@@ -1,5 +1,5 @@
-import { BehaviorSubject, combineLatest, map, Observable, startWith } from 'rxjs';
-import { Component, OnInit } from '@angular/core';
+import { BehaviorSubject, combineLatest, map, Observable, startWith, Subscription } from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { DataService } from 'src/app/services/data.service';
 import { ITUser } from 'src/app/interfaces/user';
@@ -9,12 +9,13 @@ import { ITUser } from 'src/app/interfaces/user';
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss']
 })
-export class TableComponent implements OnInit {
+export class TableComponent implements OnInit, OnDestroy {
 
   private users$ = new BehaviorSubject<ITUser[]>([]);
   public headers: Array<string> = ['№', 'Name', 'Nickname', 'E-mail'];
   public searchForm: FormGroup = new FormGroup({ "keyword": new FormControl('') });
   public filteredUsers$: Observable<ITUser[]>;
+  private aSub$: Subscription | undefined;
 
 
 
@@ -50,8 +51,9 @@ export class TableComponent implements OnInit {
     this._getData()
   }
 
+
   private _getData() {
-    this.dataService.getData().subscribe(
+    this.aSub$ = this.dataService.getData().subscribe(
       (value: ITUser[]) => {
         this.users$.next(value);
       }
@@ -59,5 +61,12 @@ export class TableComponent implements OnInit {
   }
   private _getPath(obj: string, keyword: string): Object {
     return obj.toLowerCase().indexOf(keyword.toLowerCase()) != -1
+  }
+
+  ngOnDestroy() {
+    if (this.aSub$) {
+      this.aSub$.unsubscribe();
+      this.aSub$ = undefined;
+    }
   }
 }
