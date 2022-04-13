@@ -15,16 +15,16 @@ export class TableComponent implements OnInit, OnDestroy {
   public headers: Array<string> = ['№', 'Name', 'Nickname', 'E-mail'];
   public searchForm: FormGroup = new FormGroup({ "keyword": new FormControl('') });
   public filteredUsers$: Observable<ITUser[]>;
-  private aSub$: Subscription | undefined;
+  private aSub$?: Subscription;
 
 
 
   constructor(private dataService: DataService) {
     this.filteredUsers$ = combineLatest([
       this.users$,
-      this.searchForm.get('keyword')?.valueChanges.pipe(startWith(''))
+      (this.searchForm.get('keyword')?.valueChanges as Observable<string>).pipe(startWith(''))
     ]).pipe(
-      map(([users, keyword]: Array<ITUser | any>) => {
+      map(([users, keyword]: [Array<ITUser>, string]) => {
         if (!users) {
           return [];
         }
@@ -36,12 +36,7 @@ export class TableComponent implements OnInit, OnDestroy {
           const pathNick = this._getPath(user.username, keyword);
           const pathEmail = this._getPath(user.email, keyword);
 
-          if (pathName) {
-            return pathName
-          } else if (pathNick) {
-            return pathNick
-          }
-          return pathEmail
+          return pathName || pathNick || pathEmail || false
         })
       })
     )
@@ -59,7 +54,7 @@ export class TableComponent implements OnInit, OnDestroy {
       }
     )
   }
-  private _getPath(obj: string, keyword: string): Object {
+  private _getPath(obj: string, keyword: string): boolean {
     return obj.toLowerCase().indexOf(keyword.toLowerCase()) != -1
   }
 
