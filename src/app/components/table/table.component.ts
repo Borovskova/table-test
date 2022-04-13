@@ -10,16 +10,19 @@ import { ITUser } from 'src/app/interfaces/user';
   styleUrls: ['./table.component.scss']
 })
 export class TableComponent implements OnInit {
+
   private users$ = new BehaviorSubject<ITUser[]>([]);
   public headers: Array<string> = ['№', 'Name', 'Nickname', 'E-mail'];
   public searchForm: FormGroup = new FormGroup({ "keyword": new FormControl('') });
   public filteredUsers$: Observable<ITUser[]>;
+
+
   constructor(private dataService: DataService) {
     this.filteredUsers$ = combineLatest([
       this.users$,
       this.searchForm.get('keyword')?.valueChanges.pipe(startWith(''))
     ]).pipe(
-      map(([users, keyword]:any) => {
+      map(([users, keyword]: Array<ITUser | any>) => {
         if (!users) {
           return [];
         }
