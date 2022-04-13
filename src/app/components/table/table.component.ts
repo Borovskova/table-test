@@ -17,6 +17,7 @@ export class TableComponent implements OnInit {
   public filteredUsers$: Observable<ITUser[]>;
 
 
+
   constructor(private dataService: DataService) {
     this.filteredUsers$ = combineLatest([
       this.users$,
@@ -29,12 +30,17 @@ export class TableComponent implements OnInit {
         return users.filter((user: ITUser) => {
           if (!user) {
             return false;
-          } else if (user.username.toLowerCase().indexOf(keyword.toLowerCase()) != -1) {
-            return user.username.toLowerCase().indexOf(keyword.toLowerCase()) != -1
-          } else if (user.email.toLowerCase().indexOf(keyword.toLowerCase()) != -1) {
-            return user.email.toLowerCase().indexOf(keyword.toLowerCase()) != -1
           }
-          return user.name.toLowerCase().indexOf(keyword.toLowerCase()) != -1
+          const pathName = this._getPath(user.name, keyword);
+          const pathNick = this._getPath(user.username, keyword);
+          const pathEmail = this._getPath(user.email, keyword);
+
+          if (pathName) {
+            return pathName
+          } else if (pathNick) {
+            return pathNick
+          }
+          return pathEmail
         })
       })
     )
@@ -50,5 +56,8 @@ export class TableComponent implements OnInit {
         this.users$.next(value);
       }
     )
+  }
+  private _getPath(obj: string, keyword: string): Object {
+    return obj.toLowerCase().indexOf(keyword.toLowerCase()) != -1
   }
 }
