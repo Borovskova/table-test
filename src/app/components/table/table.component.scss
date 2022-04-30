@@ -19,6 +19,12 @@
           position: sticky;
           top: 0;
           background: #ffff;
+          cursor: pointer;
+
+          .arrow-down-rotate{
+            transform: rotate(180deg);
+            cursor: pointer;
+          }
         }
 
         .cell {

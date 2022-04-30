@@ -4,11 +4,13 @@
     <table class="users-table">
       <thead>
         <tr class="row">
-          <th class="header" *ngFor="let header of headers">{{header}}</th>
+          <th (click)="sortBy(header)" class="header" *ngFor="let header of headers">{{header.label}} 
+            <img src="assets/images/DownArrow.svg" alt="arrow-down"[ngClass]="{'arrow-down-rotate': header.isSort}">
+          </th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let user of filteredUsers$; let i = index;" class="row">
+        <tr *ngFor="let user of filteredUsers; let i = index;" class="row">
           <td class="cell">{{i + 1}}</td>
           <td class="cell">{{user.name}}</td>
           <td class="cell">{{user.username}}</td>
